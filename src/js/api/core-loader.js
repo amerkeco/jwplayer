@@ -30,21 +30,23 @@ export function chunkLoadWarningHandler(code, error) {
 }
 
 export function selectBundle(model) {
-    const controls = model.get('controls');
-    const polyfills = requiresPolyfills();
-    const html5Provider = requiresProvider(model, 'html5');
+    if (!__HEADLESS__) {
+        const controls = model.get('controls');
+        const polyfills = requiresPolyfills();
+        const html5Provider = requiresProvider(model, 'html5');
 
-    if (controls && polyfills && html5Provider) {
-        return loadControlsPolyfillHtml5Bundle();
-    }
-    if (controls && html5Provider) {
-        return loadControlsHtml5Bundle();
-    }
-    if (controls && polyfills) {
-        return loadControlsPolyfillBundle();
-    }
-    if (controls) {
-        return loadControlsBundle();
+        if (controls && polyfills && html5Provider) {
+            return loadControlsPolyfillHtml5Bundle();
+        }
+        if (controls && html5Provider) {
+            return loadControlsHtml5Bundle();
+        }
+        if (controls && polyfills) {
+            return loadControlsPolyfillBundle();
+        }
+        if (controls) {
+            return loadControlsBundle();
+        }
     }
     return loadCore();
 }

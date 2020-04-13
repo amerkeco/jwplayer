@@ -23,6 +23,10 @@ import { osVersion } from './os-version';
 import { memoize } from 'utils/underscore';
 import type { GenericObject } from 'types/generic.type';
 
+declare global {
+    const __HEADLESS__: boolean;
+}
+
 const userAgent: string = navigator.userAgent;
 const noop: () => void = () => {
     // Do nothing
@@ -31,13 +35,15 @@ const noop: () => void = () => {
 function supportsPassive(): boolean {
     let passiveOptionRead = false;
 
-    try {
-        const opts: GenericObject = Object.defineProperty({}, 'passive', {
-            get: () => (passiveOptionRead = true)
-        });
-        window.addEventListener('testPassive', noop, opts);
-        window.removeEventListener('testPassive', noop, opts);
-    } catch (e) {/* noop */}
+    if (!__HEADLESS__) {
+        try {
+            const opts: GenericObject = Object.defineProperty({}, 'passive', {
+                get: () => (passiveOptionRead = true)
+            });
+            self.addEventListener('testPassive', noop, opts);
+            self.removeEventListener('testPassive', noop, opts);
+        } catch (e) {/* noop */}
+    }
 
     return passiveOptionRead;
 }
