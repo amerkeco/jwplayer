@@ -6,9 +6,10 @@ import { isValidNumber, isNumber } from 'utils/underscore';
 import { seconds } from 'utils/strings';
 import Providers from 'providers/providers';
 import type { StreamType } from 'providers/utils/stream-type';
-import type { DefaultProvider, GenericObject, TextTrackLike, Localization } from 'types/generic.type';
+import type { GenericObject, TextTrackLike, Localization } from 'types/generic.type';
 import type { QualityLevel } from 'providers/data-normalizer';
 import type PlaylistItem from 'playlist/item';
+import type { ProviderWithMixins } from 'providers/default';
 
 type AutoStart = boolean | 'viewable';
 export type PauseReason = 'external' | 'interaction' | 'viewable';
@@ -61,7 +62,9 @@ export type PlayerModelAttributes = {
     playOnViewable: boolean;
     playReason: PlayReason;
     playRejected: boolean;
-    provider: DefaultProvider;
+    provider?: {
+        name: string;
+    };
     qualityLabel: string;
     renderCaptionsNatively: boolean;
     state: InternalPlayerState;
@@ -81,7 +84,7 @@ interface Model {
 
 // Represents the state of the player
 class Model extends SimpleModel {
-    private _provider: DefaultProvider | null;
+    private _provider: ProviderWithMixins | null;
     private providerController: Providers | null;
 
     // These properties are assigned as attribute getters
@@ -155,7 +158,7 @@ class Model extends SimpleModel {
         }
     }
 
-    getVideo(): DefaultProvider | null {
+    getVideo(): ProviderWithMixins | null {
         return this._provider;
     }
 
@@ -205,7 +208,7 @@ class Model extends SimpleModel {
         }
     }
 
-    setProvider(provider: DefaultProvider): void {
+    setProvider(provider: ProviderWithMixins): void {
         this._provider = provider;
         syncProviderProperties(this, provider);
     }
@@ -300,7 +303,7 @@ class Model extends SimpleModel {
     }
 }
 
-const syncProviderProperties = (model: Model, provider: DefaultProvider) => {
+const syncProviderProperties = (model: Model, provider: ProviderWithMixins) => {
     model.set('provider', provider.getName());
     if (model.get('instreamMode') === true) {
         provider.instreamMode = true;
