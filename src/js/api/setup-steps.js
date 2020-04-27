@@ -2,7 +2,7 @@ import { PLAYLIST_LOADED, ERROR } from 'events/events';
 import PlaylistLoader from 'playlist/loader';
 import Playlist, { filterPlaylist, validatePlaylist } from 'playlist/playlist';
 import ScriptLoader from 'utils/scriptloader';
-import { bundleContainsProviders } from 'api/core-loader';
+import { bundleContainsProviders } from 'api/core-bundle-loader';
 import { composePlayerError, PlayerError,
     SETUP_ERROR_LOADING_PLAYLIST, SETUP_ERROR_LOADING_PROVIDER,
     ERROR_LOADING_TRANSLATIONS, ERROR_LOADING_TRANSLATIONS_EMPTY_RESPONSE } from 'api/errors';
@@ -56,6 +56,10 @@ export function loadProvider(_model) {
             throw e;
         }
 
+        if (__HEADLESS__) {
+            return Promise.resolve();
+        }
+
         const providersManager = _model.getProviders();
         const { provider, name } = providersManager.choose(playlist[0].sources[0]);
 
@@ -64,7 +68,7 @@ export function loadProvider(_model) {
             return provider;
         }
 
-        if (bundleContainsProviders.html5 && name === 'html5') {
+        if (!__HEADLESS__ && bundleContainsProviders.html5 && name === 'html5') {
             return bundleContainsProviders.html5;
         }
         return providersManager.load(name)

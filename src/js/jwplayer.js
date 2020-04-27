@@ -30,7 +30,14 @@ const jwplayer = function(query) {
         player = playerById(query);
         if (!player) {
             if (__HEADLESS__) {
-                domElement = { id: query };
+                domElement = {
+                    id: query,
+                    // Used by plugins
+                    querySelector(/* selector */) {
+                        // console.warn(`api.getContainer().querySelector("${selector}") not supported`);
+                        return null;
+                    }
+                };
             } else {
                 domElement = document.getElementById(query);
             }

@@ -22,7 +22,7 @@ const MimeTypes = {
     hls: 'application/vnd.apple.mpegurl'
 };
 
-const SupportsMatrix = [
+export const SupportsMatrix = __HEADLESS__ ? [] : [
     {
         name: 'html5',
         supports: supportsType
@@ -30,7 +30,7 @@ const SupportsMatrix = [
 ];
 
 export function supportsType(source) {
-    if (!video || !video.canPlayType) {
+    if (__HEADLESS__ || !video || !video.canPlayType) {
         return false;
     }
 
@@ -64,5 +64,3 @@ export function supportsType(source) {
     // (But only if it's a video with an extension known to work in HTML5)
     return !!video.canPlayType(mimeType);
 }
-
-export default SupportsMatrix;
